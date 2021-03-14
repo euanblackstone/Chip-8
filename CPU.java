@@ -26,6 +26,9 @@ class CPU
     
     private boolean isPaused;
 
+    //variable to control the speed of the emulation cycle
+    private int speed;
+
     CPU(Keyboard keyboard, Graphics renderer, Speaker speaker)
     {
         keyboard = keyboard;
@@ -44,13 +47,16 @@ class CPU
         delayTimer = 0;
         soundTimer = 0;
 
-        //will change later
-        PC = 0;
+        //address that programs are expected to be loaded at
+        PC = 0x200;
 
         //array of 16 16-bit values for stack
         stack = new short[16];
 
         //false on initialization
         isPaused = false;
+
+        //im leaving this at 0 for now, but will change it once i find a suitable speed
+        speed = 0;
     }
 }
