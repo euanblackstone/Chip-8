@@ -1,3 +1,6 @@
+import java.io.File;
+import java.nio.file.Files;
+
 class CPU
 {
     //things I will need later
@@ -58,5 +61,47 @@ class CPU
 
         //im leaving this at 0 for now, but will change it once i find a suitable speed
         speed = 0;
+    }
+
+    private void loadRomIntoMemory(String romName)
+    {
+        //accesses the rom file and puts all bytes into a byte array
+        File rom = new File("roms/" + romName);
+        byte[] romBytes = Files.readAllBytes(rom.toPath());
+
+        //for loop to read all bytes of rom and store it in memory starting at address 0x200
+        for(int i = 0; i < romBytes.length; i++)
+        {
+            memory[0x200 + i] = romBytes[i];
+        }
+    }
+
+    private void loadFontsetInMemory()
+    {
+        //binary representation of hex characters 0-f
+        byte[] fontset = {
+            (byte) 0xF0, (byte) 0x90, (byte) 0x90, (byte) 0x90, (byte) 0xF0, // 0
+            (byte) 0x20, (byte) 0x60, (byte) 0x20, (byte) 0x20, (byte) 0x70, // 1
+            (byte) 0xF0, (byte) 0x10, (byte) 0xF0, (byte) 0x80, (byte) 0xF0, // 2
+            (byte) 0xF0, (byte) 0x10, (byte) 0xF0, (byte) 0x10, (byte) 0xF0, // 3
+            (byte) 0x90, (byte) 0x90, (byte) 0xF0, (byte) 0x10, (byte) 0x10, // 4
+            (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x10, (byte) 0xF0, // 5
+            (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x90, (byte) 0xF0, // 6
+            (byte) 0xF0, (byte) 0x10, (byte) 0x20, (byte) 0x40, (byte) 0x40, // 7
+            (byte) 0xF0, (byte) 0x90, (byte) 0xF0, (byte) 0x90, (byte) 0xF0, // 8
+            (byte) 0xF0, (byte) 0x90, (byte) 0xF0, (byte) 0x10, (byte) 0xF0, // 9
+            (byte) 0xF0, (byte) 0x90, (byte) 0xF0, (byte) 0x90, (byte) 0x90, // A
+            (byte) 0xE0, (byte) 0x90, (byte) 0xE0, (byte) 0x90, (byte) 0xE0, // B
+            (byte) 0xF0, (byte) 0x80, (byte) 0x80, (byte) 0x80, (byte) 0xF0, // C
+            (byte) 0xE0, (byte) 0x90, (byte) 0x90, (byte) 0x90, (byte) 0xE0, // D
+            (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x80, (byte) 0xF0, // E
+            (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x80, (byte) 0x80  // F
+        };
+
+        //loading sprites into memory at hex address 0x000
+        for(int i = 0; i < fontset.length; i++)
+        {
+            memory[i] = fontset[i];
+        }
     }
 }
