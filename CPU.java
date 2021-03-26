@@ -63,6 +63,7 @@ class CPU
         speed = 0;
     }
 
+    //method to load the rom into memory
     private void loadRomIntoMemory(String romName)
     {
         //accesses the rom file and puts all bytes into a byte array
@@ -76,6 +77,7 @@ class CPU
         }
     }
 
+    //method to load the sprites into memory
     private void loadFontsetInMemory()
     {
         //binary representation of hex characters 0-f
