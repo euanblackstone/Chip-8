@@ -131,9 +131,10 @@ class CPU
             if(!isPaused)
             {
                 //bit manipulation to get full opcode, since they are 2 bytes each.
-                //Retrieves first bit from memory and shifts it 8 bits, then bitwise or with next bit in memory
-                //after opcode is retrieved, the instruction is executed
+                //Retrieves first byte from memory and shifts it 8 bits, then bitwise or with next byte in memory
+                //after opcode is retrieved, the pc is incremented by 2 and the instruction is executed
                 int opcode = (memory[PC] << 8 | memory[PC + 1]);
+                PC =+ 2;
                 executeOpcode(opcode);
             }
         }
