@@ -59,8 +59,8 @@ class CPU
         //false on initialization
         isPaused = false;
 
-        //im leaving this at 0 for now, but will change it once i find a suitable speed
-        speed = 0;
+        //im leaving this at 10 for now, but will change it once i find a suitable speed
+        speed = 10;
     }
 
     //method to load the rom into memory
@@ -105,5 +105,53 @@ class CPU
         {
             memory[i] = fontset[i];
         }
+    }
+
+    //method to update the timers
+    private void updateTimers()
+    {
+        if(delayTimer > 0)
+        {
+            delayTimer -= 1;
+        }
+
+        if(soundTimer > 0)
+        {
+            soundTimer -= 1;
+        }
+    }
+
+    //method for the cpu cycle
+    private void emulateCycle()
+    {
+        //loop that will control the speed of execution
+        for(int i = 0; i < speed; i++)
+        {
+            //execution will stop if the game is stopped
+            if(!isPaused)
+            {
+                //bit manipulation to get full opcode, since they are 2 bytes each.
+                //Retrieves first bit from memory and shifts it 8 bits, then bitwise or with next bit in memory
+                //after opcode is retrieved, the instruction is executed
+                int opcode = (memory[PC] << 8 | memory[PC + 1]);
+                executeOpcode(opcode);
+            }
+        }
+
+        //timers are updated while the game is not paused
+        if(!isPaused)
+        {
+            updateTimers();
+        }
+
+        //methods to play sound and draw graphics will go here
+
+
+    }
+
+    //method to execute each opcode
+    private void executeOpcode(int opcode)
+    {
+
     }
 }
