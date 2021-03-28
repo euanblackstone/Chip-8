@@ -153,6 +153,10 @@ class CPU
     //method to execute each opcode
     private void executeOpcode(int opcode)
     {
+        //monolithic switch statement to handle the execution of the instruction
+        switch(opcode & 0xF)
+        {
 
+        }
     }
 }
