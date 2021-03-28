@@ -34,9 +34,9 @@ class CPU
 
     CPU(Keyboard keyboard, Graphics renderer, Speaker speaker)
     {
-        keyboard = keyboard;
-        renderer = renderer;
-        speaker = speaker;
+        this.keyboard = keyboard;
+        this.renderer = renderer;
+        this.speaker = speaker;
 
         //chip 8 has 4096 bytes of memory
         memory = new byte[4096];
@@ -154,7 +154,8 @@ class CPU
     private void executeOpcode(int opcode)
     {
         //monolithic switch statement to handle the execution of the instruction
-        switch(opcode & 0xF)
+        //"opcode & 0xF000" will give the first 4 bits of the opcode
+        switch(opcode & 0xF000)
         {
 
         }
