@@ -1,5 +1,6 @@
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayDeque;
 
 class CPU
 {
@@ -25,7 +26,7 @@ class CPU
     private short PC;
 
     //short array for stack
-    private short[] stack;
+    private ArrayDeque<Short> stack;
     
     private boolean isPaused;
 
@@ -39,28 +40,29 @@ class CPU
         this.speaker = speaker;
 
         //chip 8 has 4096 bytes of memory
-        memory = new byte[4096];
+        this.memory = new byte[4096];
 
         //chip 8 has 16 8-bit registers
-        v = new byte[16];
+        this.v = new byte[16];
 
         //0 at initialization
-        i = 0;
+        this.i = 0;
 
-        delayTimer = 0;
-        soundTimer = 0;
+        this.delayTimer = 0;
+        this.soundTimer = 0;
 
         //address that programs are expected to be loaded at
-        PC = 0x200;
+        this.PC = 0x200;
 
         //array of 16 16-bit values for stack
-        stack = new short[16];
+        //stack = new short[16];
+        this.stack = new ArrayDeque<Short>();
 
         //false on initialization
-        isPaused = false;
+        this.isPaused = false;
 
         //im leaving this at 10 for now, but will change it once i find a suitable speed
-        speed = 10;
+        this.speed = 10;
     }
 
     //method to load the rom into memory
@@ -73,7 +75,7 @@ class CPU
         //for loop to read all bytes of rom and store it in memory starting at address 0x200
         for(int i = 0; i < romBytes.length; i++)
         {
-            memory[0x200 + i] = romBytes[i];
+            this.memory[0x200 + i] = romBytes[i];
         }
     }
 
@@ -103,21 +105,21 @@ class CPU
         //loading sprites into memory at hex address 0x000
         for(int i = 0; i < fontset.length; i++)
         {
-            memory[i] = fontset[i];
+            this.memory[i] = fontset[i];
         }
     }
 
     //method to update the timers
     private void updateTimers()
     {
-        if(delayTimer > 0)
+        if(this.delayTimer > 0)
         {
-            delayTimer -= 1;
+            this.delayTimer -= 1;
         }
 
-        if(soundTimer > 0)
+        if(this.soundTimer > 0)
         {
-            soundTimer -= 1;
+            this.soundTimer -= 1;
         }
     }
 
@@ -125,22 +127,22 @@ class CPU
     private void emulateCycle()
     {
         //loop that will control the speed of execution
-        for(int i = 0; i < speed; i++)
+        for(int i = 0; i < this.speed; i++)
         {
             //execution will stop if the game is stopped
-            if(!isPaused)
+            if(!this.isPaused)
             {
                 //bit manipulation to get full opcode, since they are 2 bytes each.
                 //Retrieves first byte from memory and shifts it 8 bits, then bitwise or with next byte in memory
                 //after opcode is retrieved, the pc is incremented by 2 and the instruction is executed
-                int opcode = (memory[PC] << 8 | memory[PC + 1]);
-                PC =+ 2;
+                int opcode = (this.memory[this.PC] << 8 | this.memory[this.PC + 1]);
+                this.PC =+ 2;
                 executeOpcode(opcode);
             }
         }
 
         //timers are updated while the game is not paused
-        if(!isPaused)
+        if(!this.isPaused)
         {
             updateTimers();
         }
@@ -153,11 +155,109 @@ class CPU
     //method to execute each opcode
     private void executeOpcode(int opcode)
     {
+        byte x = (byte) ((opcode & 0x0F00) >> 8);
+        byte y = (byte) ((opcode & 0x00F0) >> 4);
+        
         //monolithic switch statement to handle the execution of the instruction
         //"opcode & 0xF000" will give the first 4 bits of the opcode
         switch(opcode & 0xF000)
         {
+            //first opcodes to do are 00E0, 1nnn, 6xnn, 7xnn, Annn, Dxyn
+            case 0x0000:
+                switch(opcode)
+                {
+                    //opcode to clear the screen
+                    case 0x00E0:
+                        break;
+                    //opcode to return from a subroutine
+                    case 0x00EE:
+                        this.PC = this.stack.pop();
+                        break;
+                }
+                break;
+            //sets the program counter to the last 12 bits of the opcode
+            case 0x1000:
+                this.PC = (short) (opcode & 0x0FFF);
+                break;
+            //pushes the current PC on to the stack, and then sets it to the last 12 bits of the opcode
+            case 0x2000:
+                this.stack.push(this.PC);
+                this.PC = (short) (opcode & 0x0FFF);
+                break;
+            //increments pc by 2 if vx = last byte of opcode
+            case 0x3000:
+                if(this.v[x] == (opcode & 0x00FF))
+                    this.PC +=2;
+                break;
+            //increments pc by 2 if vx != last byte
+            case 0x4000:
+                if(this.v[x] != (opcode & 0x00FF))
+                    this.PC +=2;
+                break;
+            //increments pc by 2 if vx = vy
+            case 0x5000:
+                if(this.v[x] == this.v[y])
+                    this.PC += 2;
+                break;
+            //last byte of opcode is put into vx
+            case 0x6000:
+                this.v[x] = (byte) (opcode & 0x00FF);
+                break;
+            //adds last byte of opcode to value in vx
+            case 0x7000:
+                this.v[x] = (byte) (this.v[x] + (opcode & 0x00FF));
+                break;
 
+            case 0x8000:
+                switch(opcode & 0x000F)
+                {
+                    //stores vy into vx
+                    case 0x0:
+                        this.v[x] = this.v[y];
+                        break;
+                    
+                    case 0x1:
+                        this.v[x] = (byte) (this.v[x] | this.v[y]);
+                        break;
+
+                    case 0x2:
+                        this.v[x] = (byte) (this.v[x] & this.v[y]);
+                        break;
+
+                    case 0x3:
+                        this.v[x] = (byte) (this.v[x] ^ this.v[y]);
+                        break;
+
+                    case 0x4:
+                        int sum = this.v[x] + this.v[y];
+
+                        this.v[0xF] = 0;
+
+                        if(sum > 0xFF)
+                            this.v[0xF] = 1;
+
+                        this.v[x] = (byte) sum;
+                        break;
+
+                    case 0x5:
+                        this.v[0xF] = 0;
+
+                        if(this.v[x] > this.v[y])
+                            this.v[0xF] = 1;
+
+                        this.v[x] = (byte) (this.v[x] - this.v[y]);
+                        break;
+
+                    case 0x6:
+                        break;
+
+                    case 0x7:
+                        break;
+
+                    case 0xE:
+                        break;
+                }
+            
         }
     }
 }
