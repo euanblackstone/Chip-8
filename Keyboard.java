@@ -32,29 +32,25 @@ class Keyboard extends KeyAdapter
     //key to escape out of the emulator
     private static final int QUIT_KEY = KeyEvent.VK_ESCAPE;
 
-    public Keyboard()
-    {
+    public Keyboard() {
         //initializes currentKeyPressed to 0
         currentKeyPressed = 0;
     }
 
     //method that writes the key being pressed to the current key pressed variable
     @Override
-    public void keyPressed(KeyEvent e)
-    {
+    public void keyPressed(KeyEvent e) {
         currentKeyPressed = keyMap.get(e.getKeyCode());
     }
 
     //method that clears the current key being pressed if released
     @Override
-    public void keyReleased(KeyEvent e)
-    {
+    public void keyReleased(KeyEvent e) {
         currentKeyPressed = 0;
     }
 
     //returns current key being pressed
-    public int getCurrentKey()
-    {
+    public int getCurrentKey() {
         return currentKeyPressed;
     }
 }
