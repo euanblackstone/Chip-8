@@ -206,19 +206,19 @@ class CPU {
                     case 0x0:
                         this.v[x] = this.v[y];
                         break;
-                    
+                    //bitwise ors v[x] and v[y] and stores it in v[x]
                     case 0x1:
                         this.v[x] = (short) (this.v[x] | this.v[y]);
                         break;
-
+                    //bitwise ands v[x] and v[y] and stores it
                     case 0x2:
                         this.v[x] = (short) (this.v[x] & this.v[y]);
                         break;
-
+                    //bitwise xors v[x] and v[y] and stores it
                     case 0x3:
                         this.v[x] = (short) (this.v[x] ^ this.v[y]);
                         break;
-
+                    //stores the sum of v[x] and v[y] in v[x]
                     case 0x4:
                         int sum = this.v[x] + this.v[y];
 
@@ -227,24 +227,26 @@ class CPU {
                         if(sum > 0xFF)
                             this.v[0xF] = 1;
 
+                        //sum & 0xFF prevents against overflow if sum > 255
                         this.v[x] = (short) (sum & 0xFF);
                         break;
-
+                    //v[x] = v[x] - v[y]
                     case 0x5:
                         this.v[0xF] = 0;
 
                         if(this.v[x] > this.v[y])
                             this.v[0xF] = 1;
 
+                        //& 0xFF prevents negative values from being stored
                         this.v[x] = (short) ((this.v[x] - this.v[y]) & 0xFF);
                         break;
-
+                    //v[f] is set to the least significant bit of v[x], v[x] is then divided by 2 by shifting it one bit to the right
                     case 0x6:
                         this.v[0xF] = (byte) (this.v[x] & 0x1);
 
                         this.v[x] >>= 1;
                         break;
-
+                    //v[x] = v[y] - v[x]
                     case 0x7:
                         this.v[0xF] = 0;
 
@@ -253,23 +255,24 @@ class CPU {
 
                         this.v[x] = (short) ((this.v[y] - this.v[x]) & 0xFF);
                         break;
-
+                    //v[f] is set to the most significant bit of v[x], v[x] is multiplied by 2 by shirting one bit to the left
                     case 0xE:
                         this.v[0xF] = (byte) (this.v[x] & 0x80);
 
                         this.v[x] <<= 1;
                         break;
                 }
+            //skips next instruction if v[x] != v[y]
             case 0x9000:
                 if(this.v[x] != this.v[y]) {
                     this.PC += 2;
                 }
                 break;
-               
+            //register i is set to the last 12 bits of opcode 
             case 0xA000:
                 this.i = (short) (opcode & 0x0FFF);
                 break;
-            
+            //prgram counter is set to the value of last 12 bits of opcode + value from register v[0]
             case 0xB000:
                 this.PC = ((opcode & 0x0FFF) + this.v[0]);
                 break;
