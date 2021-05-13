@@ -1,7 +1,5 @@
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 class Screen extends JPanel {
@@ -60,6 +58,10 @@ class Screen extends JPanel {
                 g.fillRect(x*scale, y*scale, scale, scale);
             }
         }
+    }
+
+    public void repaintScreen() {
+        repaint();
     }
 
     public void paintComponent(Graphics g) {

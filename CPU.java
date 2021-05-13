@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayDeque;
 
@@ -7,7 +8,7 @@ class CPU {
     //things I will need later
     private Keyboard keyboard;
     private Screen renderer;
-    private Speaker speaker;
+    //private Speaker speaker;
 
     //variable to store the memory
     private short[] memory;
@@ -34,10 +35,10 @@ class CPU {
     //variable to control the speed of the emulation cycle
     private int speed;
 
-    CPU(Keyboard keyboard, Screen renderer, Speaker speaker) {
+    CPU(Keyboard keyboard, Screen renderer) {
         this.keyboard = keyboard;
         this.renderer = renderer;
-        this.speaker = speaker;
+        //this.speaker = speaker;
 
         //chip 8 has 4096 bytes of memory
         //since java does not have unsigned bytes, a short array is being used
@@ -72,7 +73,7 @@ class CPU {
 
     */
     //method to load the rom into memory
-    private void loadRomIntoMemory(String romName) {
+    public void loadRomIntoMemory(String romName) throws IOException {
         //accesses the rom file and puts all bytes into a byte array
         File rom = new File("roms/" + romName);
         byte[] romBytes = Files.readAllBytes(rom.toPath());
@@ -84,7 +85,7 @@ class CPU {
     }
 
     //method to load the sprites into memory
-    private void loadFontsetInMemory() {
+    public void loadFontsetInMemory() {
         //binary representation of hex characters 0-f
         byte[] fontset = {
             (byte) 0xF0, (byte) 0x90, (byte) 0x90, (byte) 0x90, (byte) 0xF0, // 0
@@ -123,7 +124,7 @@ class CPU {
     }
 
     //method for the cpu cycle
-    private void emulateCycle() {
+    public void emulateCycle() {
         //loop that will control the speed of execution
         for(int i = 0; i < this.speed; i++) {
             //execution will stop if the game is stopped
@@ -143,6 +144,7 @@ class CPU {
         }
 
         //methods to play sound and draw graphics will go here
+        this.renderer.repaintScreen();
 
 
     }
@@ -277,7 +279,32 @@ class CPU {
                 this.PC = ((opcode & 0x0FFF) + this.v[0]);
                 break;
                 
-            
+            case 0xC000:
+                int rand = (int)(Math.random() * 0xFF + 1);
+
+                this.v[x] = (short) ((short) rand & (opcode & 0xFF));
+                break;
+
+            case 0xD000:
+                int width = 8;
+                int height = (opcode & 0xF);
+
+                this.v[0xF] = 0;
+
+                for(int row = 0; row < height; row++) {
+                    int sprite = this.memory[this.i + row];
+
+                    for(int col = 0; col < width; col++) {
+                        if((sprite & 0x80) > 0) {
+                            if(this.renderer.togglePixel(this.v[x] + col, this.v[y] + row)) {
+                                this.v[0xF] = 1;
+                            }
+                        }
+
+                        sprite <<= 1;
+                    }
+                }
+                break;
         }
     }
 }
