@@ -6,7 +6,7 @@ import java.util.ArrayDeque;
 class CPU {
     //things I will need later
     private Keyboard keyboard;
-    private Graphics renderer;
+    private Screen renderer;
     private Speaker speaker;
 
     //variable to store the memory
@@ -34,7 +34,7 @@ class CPU {
     //variable to control the speed of the emulation cycle
     private int speed;
 
-    CPU(Keyboard keyboard, Graphics renderer, Speaker speaker) {
+    CPU(Keyboard keyboard, Screen renderer, Speaker speaker) {
         this.keyboard = keyboard;
         this.renderer = renderer;
         this.speaker = speaker;
