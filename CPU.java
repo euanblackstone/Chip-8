@@ -307,8 +307,76 @@ class CPU {
                 break;
 
             case 0xE000:
-                switch(opcode & 0x000F) {
+                switch(opcode & 0x00FF) {
+                    case 0x009E:
+                        if(this.keyboard.getCurrentKey() == this.v[x]) {
+                            this.PC += 2;
+                        }
+                        break;
+
+                    case 0x00A1:
+                        if(this.keyboard.getCurrentKey() != this.v[x]) {
+                            this.PC += 2;
+                        }
+                        break;
+                }
+            
+            case 0xF000:
+                switch(opcode & 0x00FF) {
+                    case 0x0007:
+                        this.v[x] = (short) this.delayTimer;
+                        break;
+
+                    case 0x000A:
+                        this.isPaused = true;
+                        int currentKey = this.keyboard.getCurrentKey();
+
+                        while(currentKey == 0) {
+                            currentKey = this.keyboard.getCurrentKey();
+                        }
+
+                        this.v[x] = (short) currentKey;
+                        this.isPaused = false;
+                        break;
                     
+                    case 0x0015:
+                        this.delayTimer = this.v[x];
+                        break;
+
+                    case 0x0018:
+                        this.soundTimer = this.v[x];
+                        break;
+
+                    case 0x001E:
+                        this.i += this.v[x];
+                        break;
+
+                    case 0x0029:
+                        this.i = (short) (this.v[x] * 5);
+
+                    case 0x0033:
+                        this.memory[this.i] = (short) (this.v[x] / 100);
+
+                        this.memory[this.i + 1] = (short) ((this.v[x] % 100) / 10);
+
+                        this.memory[this.i + 2] = (short) (this.v[x] % 10);
+                        break;
+
+                    case 0x0055:
+                        for(int j = 0; j <= x; j++) {
+                            this.memory[this.i + j] = this.v[j];
+                        }
+                        break;
+
+                    case 0x0065:
+                        for(int j = 0; j <= x; j++) {
+                            this.v[j] = this.memory[this.i + j];
+                        }
+                        break;
+
+                    default:
+                        System.out.println("unexpected opcode");
+                        System.out.println(opcode);
                 }
         }
     }
