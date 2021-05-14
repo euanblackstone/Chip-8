@@ -333,6 +333,7 @@ class CPU {
 
                         while(currentKey == 0) {
                             currentKey = this.keyboard.getCurrentKey();
+                            System.out.println(currentKey);
                         }
 
                         this.v[x] = (short) currentKey;
@@ -376,7 +377,7 @@ class CPU {
 
                     default:
                         System.out.println("unexpected opcode");
-                        System.out.println(opcode);
+                        System.out.println(opcode & 0xFFFF);
                 }
         }
     }

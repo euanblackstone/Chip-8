@@ -50,6 +50,7 @@ class Emulator {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         window.add(screen);
+        window.addKeyListener(this.keypad);
         window.pack();
         window.setVisible(true);
     }
