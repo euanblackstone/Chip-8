@@ -1,5 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
+
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 class Screen extends JPanel {
@@ -46,6 +48,10 @@ class Screen extends JPanel {
         return !this.pixels[x][y];
     }
 
+    public void clear() {
+        this.pixels = new boolean[SCREEN_WIDTH][SCREEN_HEIGHT];
+    }
+
     //method to repaint the screen, will be run at 60hz
     private void render() {
         for(int y = 0; y < this.SCREEN_HEIGHT; y++) {
@@ -72,5 +78,23 @@ class Screen extends JPanel {
         g.fillRect(0, 0, this.screenCol, this.screenRows);
 
         render();
+    }
+
+    public static void main(String[] args) {
+        Screen screen = new Screen(20);
+        JFrame window = new JFrame("Chip-8");
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        window.add(screen);
+        window.pack();
+        window.setVisible(true);
+
+        screen.togglePixel(5, 3);
+        screen.togglePixel(8, 12);
+
+        screen.repaintScreen();
+
+        screen.togglePixel(1, 3);
+        screen.togglePixel(5, 3);
     }
 }

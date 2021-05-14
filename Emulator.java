@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 
 class Emulator {
     //scale for screen
-    private int scale = 10;
+    private int scale = 20;
 
     //emulator componenets
     private Screen screen;
@@ -19,24 +19,29 @@ class Emulator {
     private long now;
     private double delta;
 
+
+    private String rom;
+
     Emulator(double cpuhz, String rom) throws IOException {
         this.cpuFrequency = cpuhz;
         this.ns = 1000000000.0 / cpuFrequency;
+
+        this.rom = rom;
         
-        initializeComponents(rom);
+        initializeComponents();
     }
 
     //method to initialize the emulator components
-    private void initializeComponents(String romName) throws IOException {
-        screen = new Screen(scale);
-        keypad = new Keyboard();
-        processingUnit = new CPU(keypad, screen);
+    private void initializeComponents() throws IOException {
+        this.screen = new Screen(scale);
+        this.keypad = new Keyboard();
+        this.processingUnit = new CPU(keypad, screen);
 
         createGUI();
 
-        processingUnit.loadFontsetInMemory();
+        this.processingUnit.loadFontsetInMemory();
 
-        processingUnit.loadRomIntoMemory(romName);
+        this.processingUnit.loadRomIntoMemory(this.rom);
     }
 
     //method to create the window for my screen
@@ -49,13 +54,8 @@ class Emulator {
         window.setVisible(true);
     }
 
-    //method to emulate one cpu cycle, could be useless
-    private void cycle() {
-
-    }
-
     //method to control the refresh rate of my emulator
-    public void emulatorLoop() {
+    public void startEmulatorLoop() {
         this.then = System.nanoTime();
 
         while(true) {
@@ -64,9 +64,13 @@ class Emulator {
             this.then = this.now;
 
             if(this.delta >= 1) {
-                processingUnit.emulateCycle();
+                this.processingUnit.emulateCycle();
                 delta--;
             }
         }
+    }
+
+    public void emulateOneCycle() {
+        this.processingUnit.emulateCycle();
     }
 }

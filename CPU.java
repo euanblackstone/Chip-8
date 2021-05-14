@@ -54,7 +54,7 @@ class CPU {
         this.soundTimer = 0;
 
         //address that programs are expected to be loaded at
-        this.PC = 0x200;
+        this.PC = 0x0200;
 
         //array of 16 16-bit values for stack
         //stack = new short[16];
@@ -82,6 +82,7 @@ class CPU {
         for(int i = 0; i < romBytes.length; i++) {
             this.memory[0x200 + i] = romBytes[i];
         }
+        
     }
 
     //method to load the sprites into memory
@@ -108,7 +109,7 @@ class CPU {
 
         //loading sprites into memory at hex address 0x000
         for(int i = 0; i < fontset.length; i++) {
-            this.memory[i] = fontset[i];
+            this.memory[0x80 + i] = fontset[i];
         }
     }
 
@@ -133,7 +134,7 @@ class CPU {
                 //Retrieves first byte from memory and shifts it 8 bits, then bitwise or with next byte in memory
                 //after opcode is retrieved, the pc is incremented by 2 and the instruction is executed
                 int opcode = (this.memory[this.PC] << 8 | this.memory[this.PC + 1]);
-                this.PC =+ 2;
+                this.PC += 2;
                 executeOpcode(opcode);
             }
         }
@@ -145,8 +146,6 @@ class CPU {
 
         //methods to play sound and draw graphics will go here
         this.renderer.repaintScreen();
-
-
     }
 
     //method to execute each opcode
@@ -162,6 +161,7 @@ class CPU {
                 switch(opcode) {
                     //opcode to clear the screen
                     case 0x00E0:
+                        this.renderer.clear();
                         break;
                     //opcode to return from a subroutine
                     case 0x00EE:
@@ -181,12 +181,12 @@ class CPU {
             //increments pc by 2 if vx = last byte of opcode
             case 0x3000:
                 if(this.v[x] == (opcode & 0x00FF))
-                    this.PC +=2;
+                    this.PC += 2;
                 break;
             //increments pc by 2 if vx != last byte
             case 0x4000:
                 if(this.v[x] != (opcode & 0x00FF))
-                    this.PC +=2;
+                    this.PC += 2;
                 break;
             //increments pc by 2 if vx = vy
             case 0x5000:
@@ -305,6 +305,11 @@ class CPU {
                     }
                 }
                 break;
+
+            case 0xE000:
+                switch(opcode & 0x000F) {
+                    
+                }
         }
     }
 }
