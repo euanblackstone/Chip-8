@@ -48,8 +48,9 @@ class Emulator {
     private void createGUI() {
         JFrame window = new JFrame("Chip-8");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setSize(this.screen.getScreenWidth(), this.screen.getScreenHeight());
 
-        window.add(screen);
+        window.add(this.screen);
         window.addKeyListener(this.keypad);
         window.pack();
         window.setVisible(true);
@@ -73,5 +74,20 @@ class Emulator {
 
     public void emulateOneCycle() {
         this.processingUnit.emulateCycle();
+    }
+
+    public void startTestEmulatorLoop() {
+        this.then = System.nanoTime();
+
+        while(true) {
+            this.now = System.nanoTime();
+            this.delta += (this.now - this.then) / this.ns;
+            this.then = this.now;
+
+            if(this.delta >= 1) {
+                this.processingUnit.emulateOneCycleAtATime();
+                delta--;
+            }
+        }
     }
 }

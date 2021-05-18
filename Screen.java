@@ -31,16 +31,27 @@ class Screen extends JPanel {
 
     //toggles the pixel on or off at coordinates x,y
     public boolean togglePixel(int x, int y) {
-        if(x > this.SCREEN_WIDTH) {
-            x -= this.SCREEN_WIDTH;
-        } else if(x < 0) {
-            x += this.SCREEN_WIDTH;
+        // if(x >= this.SCREEN_WIDTH) {
+        //     x = x % this.SCREEN_WIDTH;
+        // } else if(x < 0) {
+        //     x = x % this.SCREEN_WIDTH;
+        // }
+
+        // if(y >= this.SCREEN_HEIGHT) {
+        //     y = y % this.SCREEN_HEIGHT;
+        // } else if(y < 0) {
+        //     y = y % this.SCREEN_HEIGHT;
+        // }
+
+        x = x & 0xFF;
+        y = y & 0xFF;
+
+        if(x >= this.SCREEN_WIDTH) {
+            x = x % this.SCREEN_WIDTH;
         }
 
-        if(y > this.SCREEN_HEIGHT) {
-            y -= this.SCREEN_HEIGHT;
-        } else if(y < 0) {
-            y += this.SCREEN_HEIGHT;
+        if(y >= this.SCREEN_HEIGHT) {
+            y = y % this.SCREEN_HEIGHT;
         }
 
         this.pixels[x][y] ^= true;
@@ -78,6 +89,14 @@ class Screen extends JPanel {
         g.fillRect(0, 0, this.screenCol, this.screenRows);
 
         render();
+    }
+
+    public int getScreenWidth() {
+        return this.screenCol;
+    }
+
+    public int getScreenHeight() {
+        return this.screenRows;
     }
 
     public static void main(String[] args) {

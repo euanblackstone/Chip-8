@@ -1,6 +1,6 @@
 import java.io.IOException;
 
-public class Main {
+public class Test {
     
     public static void main(String[] args) throws IOException {
         double cpuhz = 60.0;
@@ -8,7 +8,7 @@ public class Main {
         
         try {
             Emulator chip8 = new Emulator(cpuhz, rom);
-            chip8.startEmulatorLoop();
+            chip8.startTestEmulatorLoop();
         } catch(Exception ex) {
             ex.printStackTrace();
         }

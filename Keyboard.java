@@ -3,6 +3,8 @@ import java.awt.event.KeyEvent;
 
 import java.util.Map;
 
+import javax.swing.JFrame;
+
 import static java.util.Map.entry;
 
 class Keyboard extends KeyAdapter
@@ -46,6 +48,7 @@ class Keyboard extends KeyAdapter
         KeyEvent.VK_B, // Key D
         KeyEvent.VK_N, // Key E
         KeyEvent.VK_M, // Key F
+        KeyEvent.VK_RIGHT // step key
     };  
 
     //key to escape out of the emulator
@@ -82,18 +85,31 @@ class Keyboard extends KeyAdapter
         return 0;
     }
 
-    public int waitforKeyPress() {
-        while(currentKeyPressed == 0) {
-            if(currentKeyPressed != 0) {
-                break;
+    /*
+            TEST FUNCTIONS
+    */
+
+    public void stepThroughExecution() {
+        while(getCurrentKey() == 0) {
+            try {
+                Thread.sleep(0);
+            } catch(InterruptedException ex) {
+                ex.printStackTrace();
             }
         }
-
-        return currentKeyPressed;
     }
 
     public static void main(String[] args) {
-        Keyboard keypad = new Keyboard();
-        System.out.println(keypad.waitforKeyPress());
+        Keyboard keyboard = new Keyboard();
+
+        JFrame frame = new JFrame("bruh");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+
+        frame.addKeyListener(keyboard);
+
+        keyboard.stepThroughExecution();
     }
+
 }

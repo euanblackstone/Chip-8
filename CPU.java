@@ -64,14 +64,9 @@ class CPU {
         this.isPaused = false;
 
         //im leaving this at 10 for now, but will change it once i find a suitable speed
-        this.speed = 10;
+        this.speed = 8;
     }
 
-    /*
-
-        NEEDS FIXING
-
-    */
     //method to load the rom into memory
     public void loadRomIntoMemory(String romName) throws IOException {
         //accesses the rom file and puts all bytes into a byte array
@@ -80,7 +75,8 @@ class CPU {
 
         //for loop to read all bytes of rom and store it in memory starting at address 0x200
         for(int i = 0; i < romBytes.length; i++) {
-            this.memory[0x200 + i] = romBytes[i];
+            //System.out.println(Integer.toHexString((romBytes[i] & 0xFF)));
+            this.memory[0x200 + i] = (short) (romBytes[i] & 0xFF);
         }
         
     }
@@ -289,6 +285,8 @@ class CPU {
                 int width = 8;
                 int height = (opcode & 0xF);
 
+                // System.out.println(this.v[x] + ", " + this.v[y]);
+
                 this.v[0xF] = 0;
 
                 for(int row = 0; row < height; row++) {
@@ -329,14 +327,16 @@ class CPU {
 
                     case 0x000A:
                         this.isPaused = true;
-                        int currentKey = this.keyboard.getCurrentKey();
 
-                        while(currentKey == 0) {
-                            currentKey = this.keyboard.getCurrentKey();
-                            System.out.println(currentKey);
+                        while(this.keyboard.getCurrentKey() == 0) {
+                            try {
+                                Thread.sleep(0);
+                            } catch(InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
 
-                        this.v[x] = (short) currentKey;
+                        this.v[x] = (short) (this.keyboard.getCurrentKey());
                         this.isPaused = false;
                         break;
                     
@@ -374,11 +374,60 @@ class CPU {
                             this.v[j] = this.memory[this.i + j];
                         }
                         break;
-
+                    
                     default:
-                        System.out.println("unexpected opcode");
-                        System.out.println(opcode & 0xFFFF);
+                        System.out.println("^ unexpected opcode");
+
                 }
         }
+    }
+
+    /*
+            TEST FUNCTIONS
+    */
+
+    public void emulateOneCycleAtATime() {
+        //loop that will control the speed of execution
+        for(int i = 0; i < this.speed; i++) {
+            //execution will stop if the game is stopped
+            if(!this.isPaused) {
+                //bit manipulation to get full opcode, since they are 2 bytes each.
+                //Retrieves first byte from memory and shifts it 8 bits, then bitwise or with next byte in memory
+                //after opcode is retrieved, the pc is incremented by 2 and the instruction is executed
+                int opcode = (this.memory[this.PC] << 8 | this.memory[this.PC + 1]);
+                this.PC += 2;
+
+                this.keyboard.stepThroughExecution();
+                executeOpcode(opcode);
+                printMachineState(opcode);
+
+                try {
+                    Thread.sleep(500);
+                } catch(InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                
+            }
+        }
+
+        //timers are updated while the game is not paused
+        if(!this.isPaused) {
+            updateTimers();
+        }
+
+        //methods to play sound and draw graphics will go here
+        this.renderer.repaintScreen();
+    }
+
+    private void printMachineState(int executingOpcode) {
+        System.out.println("opcode - " + Integer.toHexString((executingOpcode & 0xFFFF)));
+        System.out.println("PC - " + this.PC);
+        System.out.println("I - " + this.i);
+        System.out.println("DT - " + this.delayTimer);
+        System.out.println("ST - " + this.soundTimer);
+        for(int i = 0x0; i <= 0xF; i++) {
+            System.out.println("V[" + i + "] - " + this.v[i]);
+        }
+        System.out.println("");
     }
 }
