@@ -260,6 +260,7 @@ class CPU {
                         this.v[x] <<= 1;
                         break;
                 }
+                break;
             //skips next instruction if v[x] != v[y]
             case 0x9000:
                 if(this.v[x] != this.v[y]) {
@@ -318,6 +319,7 @@ class CPU {
                         }
                         break;
                 }
+                break;
             
             case 0xF000:
                 switch(opcode & 0x00FF) {
@@ -374,11 +376,13 @@ class CPU {
                             this.v[j] = this.memory[this.i + j];
                         }
                         break;
-                    
-                    default:
-                        System.out.println("^ unexpected opcode");
-
                 }
+                break;
+
+                default:
+                    System.out.println(Integer.toHexString(opcode));
+                    System.out.println("^ unexpected opcode");
+                    break;
         }
     }
 

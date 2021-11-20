@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 
 import javax.swing.JFrame;
@@ -27,6 +28,7 @@ class Screen extends JPanel {
         pixels = new boolean[SCREEN_WIDTH][SCREEN_HEIGHT];
 
         this.scale = scaleFactor;
+        this.setPreferredSize(new Dimension(getScreenWidth(), getScreenHeight()));
     }
 
     //toggles the pixel on or off at coordinates x,y

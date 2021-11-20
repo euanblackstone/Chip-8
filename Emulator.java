@@ -49,6 +49,7 @@ class Emulator {
         JFrame window = new JFrame("Chip-8");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setSize(this.screen.getScreenWidth(), this.screen.getScreenHeight());
+        window.setResizable(false);
 
         window.add(this.screen);
         window.addKeyListener(this.keypad);
