@@ -73,22 +73,4 @@ class Emulator {
         }
     }
 
-    public void emulateOneCycle() {
-        this.processingUnit.emulateCycle();
-    }
-
-    public void startTestEmulatorLoop() {
-        this.then = System.nanoTime();
-
-        while(true) {
-            this.now = System.nanoTime();
-            this.delta += (this.now - this.then) / this.ns;
-            this.then = this.now;
-
-            if(this.delta >= 1) {
-                this.processingUnit.emulateOneCycleAtATime();
-                delta--;
-            }
-        }
-    }
 }

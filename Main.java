@@ -4,7 +4,7 @@ public class Main {
     
     public static void main(String[] args) throws IOException {
         double cpuhz = 60.0;
-        String rom = "TRIP";
+        String rom = "PONG";
         
         try {
             Emulator chip8 = new Emulator(cpuhz, rom);
