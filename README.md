@@ -21,4 +21,4 @@ $ java Main Ibm
 ## Known Issues
 * Flickering
   * With some roms, notably Pong, the screen will flicker. This is natural with the original Chip-8 specifications. To fix this, one could render the desired screen beforehand and render the screen when it finishes.
-  * The rom Blitz does not work properly.
+* The rom Blitz does not work properly.
