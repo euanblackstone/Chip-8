@@ -352,6 +352,7 @@ class CPU {
 
                     case 0x001E:
                         this.i += this.v[x];
+                        this.i = (short) (this.i & 0x0FFF);
                         break;
 
                     case 0x0029:
